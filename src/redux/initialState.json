@@ -1,0 +1,13 @@
+{
+    "document":{
+        "id":"",
+        "skinCd":null
+    },
+    "contactSet":{},
+    "educationSet":{},
+    "auth":{
+        "loading":false,
+        "error":""
+    },
+    "user":{}
+}
