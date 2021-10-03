@@ -16,29 +16,75 @@ import { useFirestore } from 'react-redux-firebase'
     
     const saveToDatabase = async () => {
       // user collection 
-      let user = await firestore.collection('users').doc(props.auth.uid).get();
+      // console.log(props.auth.uid);
+      let userRef = await firestore.collection('users').doc(props.auth.uid);
       // data get 
-      user = user.data();
-      console.log(user);
-      let newObj = null;
-      if (user.resumeIds != undefined) {
-        // /map => object 
-        newObj = {
-          ...user.resumeIds,
-          [documentd.id]: { educationSection: educationSection, contactSection: contactSection, document: documentd }
+      let docExists=false;
+      let copyOfdoc={};
+      userRef.get().then(async(doc)=>{
+        if(doc.exists){
+          docExists=true;
+          copyOfdoc=doc.data();
+          console.log(copyOfdoc);
         }
+      
+      let newObj = [];
+      // console.log(userRef);
+      // console.log(userRef.data());
+      // let user = userRef.data();
+      // console.log(userRef,user);
+      if(docExists){
+        let expand=copyOfdoc.resumeIds;
+        console.log(expand);
+        newObj = [
+          ...expand,
+          {[documentd.id]: { educationSection: educationSection, contactSection: contactSection, document: documentd }}
+        ]
+        console.log("docExists",newObj);
+        await firestore.collection('users').doc(props.auth.uid).update({
+          resumeIds: newObj
+        })
       }
-      else {
-        newObj = {
-          [documentd.id]:
-            { educationSection: educationSection, contactSection: contactSection, document: documentd }
-        }
+      else{
+        newObj = [
+          {[documentd.id]:
+            { educationSection: educationSection, contactSection: contactSection, document: documentd }}
+        ]
+        console.log("docNotExists",newObj);
+        await firestore.collection('users').doc(props.auth.uid).set({
+          resumeIds: newObj
+        })
       }
-      console.log(documentd)
-      console.log(newObj)
-      await firestore.collection('users').doc(props.auth.uid).update({
-        resumeIds: newObj
-      })
+    })
+      // if (user.resumeIds != undefined) {
+      //   // /map => object 
+      // if(userRef.exists){
+
+      //   newObj = {
+      //     ...user.resumeIds,
+      //     [documentd.id]: { educationSection: educationSection, contactSection: contactSection, document: documentd }
+      //   }
+      //   await firestore.collection('users').doc(props.auth.uid).update({
+      //     resumeIds: newObj
+      //   })
+      // }
+
+      // }
+      // else {
+      //   newObj = {
+      //     [documentd.id]:
+      //       { educationSection: educationSection, contactSection: contactSection, document: documentd }
+      //   }
+      //   await firestore.collection('users').doc(props.auth.uid).set({
+      //     "resumeIds":newObj
+      //   })
+
+      // }
+      // console.log(user.resumeIds);
+    
+      // console.log(documentd);
+      // console.log(newObj);
+      
     }
      const downloadResume=()=> {
     
